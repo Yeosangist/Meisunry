@@ -285,7 +285,7 @@ contextMenu({
     type: 'checkbox',
     click: () => {
       // Action to copy the image path to clipboard
-      const imagePath = parameters.srcURL.replace("file:///", "/").replace(/%20/g, ' '); // Get the image source URL
+      const imagePath = decodeURIComponent(parameters.srcURL.replace("file:///", "/")); // Get the image source URL
       clipboard.writeText(imagePath); // Copy the image path to clipboard
       browserWindow.webContents.send('flash-copied', imagePath); 
     }
@@ -296,28 +296,52 @@ contextMenu({
     type: 'checkbox',
     click: () => {
       // Action to copy the image path to clipboard
-      const imagePath = parameters.srcURL.replace("file:///", "/").replace(/%20/g, ' '); // Get the image source URL
+      const imagePath = decodeURIComponent(parameters.srcURL.replace("file:///", "/")); // Get the image source URL
+      clipboard.writeText(imagePath); // Copy the image path to clipboard
+      browserWindow.webContents.send('flash-copied', imagePath); 
+    }
+  },
+  {
+    label: `Delete Image`,
+    visible: hasImage,
+    type: 'checkbox',
+    click: async () => {
+      const imagePath = decodeURIComponent(parameters.srcURL.replace("file:///", "/")); // Get the image source URL
       
-      // Check if the file exists before attempting to delete it
-      fs.access(imagePath, fs.constants.F_OK, (err) => {
-        if (!err) {
-          // File exists, proceed with deletion
-          // await trash(imagePath);
-          fs.unlink(imagePath, (err) => {
-            if (err) {
-              alert("An error ocurred deleting the file" + err.message);
-              console.log(err);
-              return;
-            }
-            console.log("File succesfully deleted");
-          });
-          browserWindow.webContents.send('deleted-file', imagePath); 
-          console.log(`Deleted ${imagePath}`);
-        } else {
-          console.error('File does not exist or cannot be accessed');
-          console.log(err);
-        }
+      // Get relative path from the current folder location
+      const relativePath = path.relative(global.preferencesData.folderLocation, imagePath);
+      
+      // Show confirmation dialog
+      const result = await dialog.showMessageBox(browserWindow, {
+        type: 'question',
+        buttons: ['Cancel', 'Delete'],
+        defaultId: 0,
+        title: 'Confirm Delete',
+        message: 'Are you sure you want to move this image to trash?',
+        detail: `File: ${relativePath}`,
       });
+
+      // If user clicked Delete (button index 1)
+      if (result.response === 1) {
+        // Check if the file exists before attempting to delete it
+        fs.access(imagePath, fs.constants.F_OK, async (err) => {
+          if (!err) {
+            try {
+              // Dynamically import trash package
+              const trash = await import('trash');
+              // Move to trash instead of permanent deletion
+              await trash.default(imagePath);
+              console.log("File moved to trash successfully");
+              browserWindow.webContents.send('deleted-file', imagePath);
+            } catch (err) {
+              console.error("Error moving file to trash:", err);
+            }
+          } else {
+            console.error('File does not exist or cannot be accessed');
+            console.log(err);
+          }
+        });
+      }
     }
   },
   {
@@ -328,12 +352,12 @@ contextMenu({
     }
   },
   /*{
-    label: `Search Google for ${parameters.srcURL.replace("file:///", "")}`,
+    label: `Search Google for ${decodeURIComponent(parameters.srcURL.replace("file:///", ""))}`,
     // Only show it when right-clicking text
     visible: parameters.hasImageContents,
     click: () => {
       url = parameters.srcURL;
-      shell.openExternal(`https://lens.google.com/uploadbyurl?url=${encodeURIComponent(url)}`);
+      shell.openExternal(`https://lens.google.com/uploadbyurl?url=${url}`);
     }
   }*/
 ]
