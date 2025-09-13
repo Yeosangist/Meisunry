@@ -46,15 +46,20 @@ function hideFocusImg() {
   panZoomInstance.dispose();
   focusImg.classList.remove('show');
   focusImgVideoWrapper.classList.remove('show');
-  source = focusVideo.querySelector('source').src;
+  let source = focusVideo.querySelector('source').src;
   if (source !== null && source !== "") {
     source = source.replace("file:///", "").replace(/%20/g, ' ').replace(/\//g, "\\");
     const gridVideo = document.getElementById(source);
     if (gridVideo && gridVideo.tagName === 'VIDEO') {
-      gridVideo.play();
+      // Set playback state BEFORE calling play()
       gridVideo.currentTime = focusVideo.currentTime;
       gridVideo.muted = focusVideo.muted;
-      aEl = gridVideo.parentNode.querySelector('a')
+      // Try to resume video and catch errors
+      gridVideo.play().catch(e => {
+        // Optionally, handle or log the error
+        console.warn("Grid video play failed:", e);
+      });
+      const aEl = gridVideo.parentNode.querySelector('a')
       if (gridVideo.muted) aEl.classList.remove(`unmute`);
       else aEl.classList.add(`unmute`);
     }
