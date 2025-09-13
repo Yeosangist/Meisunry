@@ -62,19 +62,19 @@ function createImage(file) {
     const audioA = document.createElement('a');
     audioA.classList.add('audio-button');
     audioA.classList.add('overlay-circle-button');
-    // Set icon based on initial mute state
-    audioA.innerHTML = imgElement.muted ? "🔇" : "🔊";
+    // Set icon based on initial mute state using Unicode escapes
+    audioA.textContent = imgElement.muted ? "\u{1F507}" : "\u{1F50A}";
     gridItem.appendChild(audioA);
-
+    
     // Mute/unmute function with icon update
     audioA.addEventListener('click', () => {
       if (focusImgVideoWrapper.classList.contains('show')) return;
       imgElement.muted = !imgElement.muted;
-      // Update icon
-      audioA.innerHTML = imgElement.muted ? "🔇" : "🔊";
-        if (imgElement.muted) audioA.classList.remove('unmute');
-        else audioA.classList.add('unmute');
-});
+      // Update icon using Unicode escapes
+      audioA.textContent = imgElement.muted ? "\u{1F507}" : "\u{1F50A}";
+      if (imgElement.muted) audioA.classList.remove('unmute');
+      else audioA.classList.add('unmute');
+    });
 
     // Add full screen click event
     imgElement.addEventListener('click', () => {
