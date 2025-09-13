@@ -51,7 +51,6 @@ function hideFocusImg() {
     source = source.replace("file:///", "").replace(/%20/g, ' ').replace(/\//g, "\\");
     const gridVideo = document.getElementById(source);
     if (gridVideo && gridVideo.tagName === 'VIDEO') {
-      gridVideo = gridVideo.parentNode;
       gridVideo.play();
       gridVideo.currentTime = focusVideo.currentTime;
       gridVideo.muted = focusVideo.muted;
