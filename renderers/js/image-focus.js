@@ -49,8 +49,8 @@ function hideFocusImg() {
   source = focusVideo.querySelector('source').src;
   if (source !== null && source !== "") {
     source = source.replace("file:///", "").replace(/%20/g, ' ').replace(/\//g, "\\");
-    gridVideo = document.getElementById(source);
-    if (gridVideo !== null) {
+    const gridVideo = document.getElementById(source);
+    if (gridVideo && gridVideo.tagName === 'VIDEO') {
       gridVideo = gridVideo.parentNode;
       gridVideo.play();
       gridVideo.currentTime = focusVideo.currentTime;
