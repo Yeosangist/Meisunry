@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const os = require('os'); // ensure this is required
 
 /* Save data to preferencesData */
 function saveAppData() {
@@ -18,7 +19,7 @@ function loadData() {
   try {
     const fileContents = fs.readFileSync(dataFilePath, 'utf-8');
     const loadedData = JSON.parse(fileContents);
-        // Ensure the folder location uses the correct path separator
+    // Ensure the folder location uses the correct path separator
     if (loadedData.folderLocation) {
       loadedData.folderLocation = path.normalize(loadedData.folderLocation);
     }
@@ -26,7 +27,7 @@ function loadData() {
   } catch (error) {
     /* Default json */
     const baseData = {
-      folderLocation: process.platform === 'win32' ? path.join('C:', path.sep) : require('os').homedir(),
+      folderLocation: process.platform === 'win32' ? path.join('C:', path.sep) : os.homedir(),
       sortMode: "date",
       recursion: 0,
       loadSpeed: 'medium',
@@ -41,10 +42,13 @@ function loadData() {
 /* Load a folder from a path, save to preferencesData on disk, and refresh browser window */
 function loadFolder (browserWindow, selectedFolderPath) {
   console.log('Selected folder:', selectedFolderPath);
-  global.preferencesData.folderLocation = path.normalize(selectedFolderPath);  saveAppData();
+  // Always normalize incoming paths
+  global.preferencesData.folderLocation = path.normalize(selectedFolderPath);
+  saveAppData();
   loadIndex(browserWindow);
 }
 
+/* Truncate a file path to the nearest folder */
 function truncateFilePathToNearestFolder(filePath) {
   if (filePath === `./mains/main.js` || filePath.toLowerCase().includes("meisunry")) {
     return global.preferencesData.folderLocation;
@@ -52,14 +56,14 @@ function truncateFilePathToNearestFolder(filePath) {
 
   // Use path.parse to handle paths in a platform-agnostic way
   const parsed = path.parse(filePath);
-  
+
   // If it's a file (has an extension), return its directory
   if (parsed.ext) {
     return parsed.dir + path.sep;
   }
-  
-  // If it's already a directory, return it with trailing separator
-  return filePath + (filePath.endsWith(path.sep) ? '' : path.sep);
+
+  // If it's already a directory, return it with trailing separator, using path.sep
+  return filePath.endsWith(path.sep) ? filePath : filePath + path.sep;
 }
 
 function loadIndex(browserWindow) {
@@ -68,6 +72,14 @@ function loadIndex(browserWindow) {
 }
 
 function refreshGrid (browserWindow) {
-  browserWindow.webContents.send('refresh-grid-update'); 
+  browserWindow.webContents.send('refresh-grid-update');
 }
-module.exports = { saveAppData, truncateFilePathToNearestFolder, loadFolder, loadData, loadIndex, refreshGrid };
+
+module.exports = {
+  saveAppData,
+  truncateFilePathToNearestFolder,
+  loadFolder,
+  loadData,
+  loadIndex,
+  refreshGrid
+};
