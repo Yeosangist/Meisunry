@@ -17,8 +17,15 @@ let panZoomInstance = panzoom(zoomPanHolder);
 panZoomInstance.dispose();
 
 // Grid zoom / padding
-currentZoom = 1;
+currentZoom = 1.5;
 currentPadding = .98;
+
+// Load saved zoom level
+window.electronAPI.getZoomLevel().then(zoomLevel => {
+  if (zoomLevel) {
+    currentZoom = zoomLevel;
+  }
+});
 
 let grid;
 let allFiles;

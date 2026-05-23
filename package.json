@@ -1,55 +1,53 @@
 {
-  "name": "Meisunry",
-  "version": "1.1.1",
+  "name": "Cascade",
+  "version": "1.0.1",
   "description": "A masonry image viewer",
   "main": "./mains/main.js",
   "scripts": {
     "start": "electron ./mains/main.js",
-    "package": "electron-forge package",
-    "make": "electron-forge make"
+    "package": "electron-builder package",
+    "make": "electron-builder make"
   },
-  "author": "Jonah Grimm",
+  "author": "Yeosangist",
   "license": "MIT",
   "devDependencies": {
-    "@electron-forge/cli": "^7.5.0",
-    "@electron-forge/maker-deb": "^7.5.0",
-    "@electron-forge/maker-rpm": "^7.5.0",
-    "@electron-forge/maker-squirrel": "^7.5.0",
-    "@electron-forge/maker-zip": "^7.5.0",
-    "@electron-forge/plugin-auto-unpack-natives": "^7.5.0",
-    "@electron-forge/plugin-fuses": "^7.5.0",
+    "@electron-builder/cli": "^7.5.0",
+    "@electron-builder/maker-deb": "^7.5.0",
+    "@electron-builder/maker-rpm": "^7.5.0",
+    "@electron-builder/maker-zip": "^7.5.0",
+    "@electron-builder/plugin-auto-unpack-natives": "^7.5.0",
+    "@electron-builder/plugin-fuses": "^7.5.0",
     "@electron/fuses": "^1.8.0",
     "electron": "^26.1.0"
   },
   "dependencies": {
     "electron-context-menu": "^3.6.1",
-    "electron-squirrel-startup": "^1.0.1",
     "masonry-layout": "^4.2.2",
     "panzoom": "^9.4.3",
     "trash": "^8.1.1"
   },
-  "iohook": {
-    "targets": [
-      "node-72",
-      "electron-85"
-    ],
-    "platforms": [
-      "win32",
-      "darwin",
-      "linux"
-    ],
-    "arches": [
-      "x64",
-      "ia32"
-    ]
-  },
   "build": {
+  "appId": "com.yeosangist.cascade",
+  "productName": "Cascade",
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "**/*",
+    "!**/node_modules",
+    "!**/*.md",
+    "!**/cascade.desktop"
+  ],
     "win": {
       "icon": "/app-icons/logo.ico"
     },
     "darwin": {
       "icon": "/app-icons/logo.png"
     },
-    "asar": false
+    "linux": {
+	  "target": ["AppImage", "deb", "rpm"],
+      "icon": "/app-icons/logo.png"
+    },
+    "asar": true
   }
 }

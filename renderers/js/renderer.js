@@ -1,3 +1,64 @@
+// * Escapes special characters in file paths
+// * @param {string} filePath
+// * @returns {string} filePath with special characters escaped
+
+// Listen for grid refresh events from main process
+window.electronAPI?.onRefreshGrid?.(async (event, fileList) => {
+  // Clear the current grid/list
+  clearGridUI();
+  // allFiles is the in-memory list (if used elsewhere)
+  allFiles = fileList || [];
+  // Load images/videos into the grid
+  await loadImages(allFiles);
+});
+
+function clearGridUI() {
+  // Remove all .grid-item elements from the grid
+  const imageGrid = document.querySelector('.grid');
+  if (imageGrid) {
+    while (imageGrid.firstChild) {
+      imageGrid.removeChild(imageGrid.firstChild);
+    }
+  }
+  // Optionally reset Masonry if used
+  if (window.grid && typeof window.grid.remove === 'function') {
+    // Remove all items from Masonry instance if needed
+    window.grid.items = [];
+    window.grid.reloadItems();
+    window.grid.layout();
+  }
+}
+
+function encodeFilePath(filePath) {
+  // Remove any existing file:// prefix
+  let cleanPath = filePath.replace(/^file:\/\//, '');
+
+  // For Windows paths starting with a drive letter, add an extra / after file:///
+  const isWindowsPath = /^[A-Za-z]:\\/.test(cleanPath);
+
+  // Ensure all slashes are forward slashes
+  cleanPath = cleanPath.replace(/\\/g, '/');
+
+  // For non-Windows paths or paths without drive letter, remove leading slash
+  if (!isWindowsPath && cleanPath.startsWith('/')) {
+    cleanPath = cleanPath.substring(1);
+  }
+
+  // Encode the path components
+  let encodedPath = cleanPath.split('/').map(encodeURIComponent).join('/');
+
+  // Add the file:// prefix with appropriate number of slashes
+  encodedPath = `file:///${encodedPath}`;
+
+  // Encode additional special characters
+  encodedPath = encodedPath.replace(
+    /[!~*'()]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+  );
+
+  return encodedPath;
+}
+
 function addImage(file) {
   const gridItem = createImage(file);
   gridItem.style.visibility = "visible";
@@ -18,7 +79,7 @@ function createImage(file) {
   gridItem.className = 'grid-item';
 
   let imgElement;
-  const imgPath = file.fullPath;
+  const imgPath = encodeFilePath(file.fullPath);
   //console.log(file.isImage);
   if (file.isImage === true)
   {
@@ -31,8 +92,7 @@ function createImage(file) {
 
     // Add full screen click event
     imgElement.addEventListener('click', () => {
-      if (focusImgVideoWrapper.classList.contains('show')) 
-      {
+      if (focusImgVideoWrapper.classList.contains('show')) {
         focusImgVideoWrapper.classList.remove('show');
         return;
       }
@@ -73,33 +133,37 @@ function createImage(file) {
 
     // Add full screen click event
     imgElement.addEventListener('click', () => {
-      if (focusImgVideoWrapper.classList.contains('show')) 
-      {
+      if (focusImgVideoWrapper.classList.contains('show')) {
         focusImgVideoWrapper.classList.remove('show');
         return;
       }
+    
       // Clear all img settings
       focusImg.src = '';
       zoomPanHolder.style.transformOrigin = `0px 0px 0px`;
       zoomPanHolder.style.transform = `inherit`;
 
       let zooming = document.body.style.zoom = 1;
-
-      // You can perform operations on the clickedImage here
+    
       focusImgVideoWrapper.classList.add('show');
       focusVideo.querySelector('source').src = imgPath;
       focusVideo.load();
       muteButtonFocus.classList.remove(`hide`);
-      backButton.classList.remove('hide');
-      // Sync settings
+      backButton.classList.remove(`hide`);
+    
+      // Sync focus video with grid video
       focusVideo.currentTime = imgElement.currentTime;
       focusVideo.muted = imgElement.muted;
       if (focusVideo.muted) muteButtonFocus.classList.remove(`unmute`);
       else muteButtonFocus.classList.add(`unmute`);
-      // Pause original because focus is playing
+    
+      // Pause the original grid video
       imgElement.muted = true;
       imgElement.pause();
       audioA.classList.remove(`unmute`);
+
+      // Store reference to the grid video element for later resumption
+      focusVideo.dataset.gridVideoId = imgPath;
     });
   }
 
@@ -179,7 +243,7 @@ async function loadImages(input_files) {
 
   const processBatch = async (animate = false) => {
     console.debug('Processing batch of', batchItems.length, 'items (animate:', animate, ')');
-    
+
     let currentBatch = batchItems;
     batchItems = [];
 
@@ -206,6 +270,9 @@ async function loadImages(input_files) {
     if (!animate)
       for (const gridItem of currentBatch)
         gridItem.style.visibility = 'visible';
+
+    // Apply current zoom and padding to newly added images
+    updateGridAndSpacing();
   };
 
   const initialBatchSize = 50;
@@ -254,6 +321,7 @@ async function loadImages(input_files) {
   // Wait for all images to load before triggering Masonry Layout
   await waitForResourcesToLoad(imageGrid.querySelectorAll('img, video'));
   grid.layout();
+  updateGridAndSpacing();
 
   console.timeEnd('loadImages');
 
@@ -275,3 +343,66 @@ async function loadImages(input_files) {
 function is_an_image_focused() {
   return focusImg.classList.contains('show');
 }
+
+let initialColor = '#2C313C';
+
+window.electronAPI.getBgColor().then(color => {
+  if (color) {
+    initialColor = color;
+    document.body.style.backgroundColor = initialColor; // apply saved color at startup
+  }
+});
+
+// Listen for background color updates from main process
+window.electronAPI.onUpdateBgColor((color) => {
+  if (color) {
+    initialColor = color;
+    document.body.style.backgroundColor = color;
+  }
+});
+
+// Listen for the event to open the color picker
+window.electronAPI.onOpenBgColorPicker(() => {
+  const colorButton = document.createElement('div');
+  colorButton.id = `color-picker-button-${Date.now()}`;
+  // Style the button as a fixed anchor point in the bottom-right corner
+  colorButton.style.position = 'fixed';
+  colorButton.style.bottom = '20px';
+  colorButton.style.right = '20px';
+  colorButton.style.zIndex = '9999';
+  colorButton.style.display = 'none';
+
+  document.body.appendChild(colorButton);
+
+    const newPickr = Pickr.create({
+      el: `#${colorButton.id}`,
+      theme: 'nano',
+      default: initialColor || '#111111',
+      useAsButton: true,
+      appendTo: document.body,
+      components: {
+        preview: true,
+        opacity: true,
+        hue: true,
+        interaction: { hex: true, input: true, save: true }
+      }
+    });
+
+  newPickr.on('change', (color) => {
+    const hex = color.toHEXA().toString();
+    document.body.style.backgroundColor = hex;
+    document.documentElement.style.setProperty('--app-bg', hex);
+  });
+
+  newPickr.on('save', (color) => {
+    const hex = color.toHEXA().toString();
+    document.body.style.backgroundColor = hex;
+    document.documentElement.style.setProperty('--app-bg', hex);
+    window.electronAPI.setBgColor(hex);   // persist to storage
+    initialColor = hex;                   // update local initialColor too
+    newPickr.hide();
+    document.body.removeChild(colorButton);
+  });
+
+  newPickr.show();
+});

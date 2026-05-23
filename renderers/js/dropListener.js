@@ -49,5 +49,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function endsWithValidFile(filename) {
-  return filename.match(/\.(jpg|jpeg|png|gif|jfif|webp|mp4|webm|mkv|avi|mov|wmv|flv|mts)$/i)
+  return filename.match(/\.(jpg|jpeg|png|gif|avif|jfif|webp|mp4|webm|mkv|avi|mov|wmv|flv|mts)$/i)
 }

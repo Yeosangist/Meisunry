@@ -26,14 +26,16 @@ function processWheel(event) {
     const zoomAmount = event.deltaY > 0 ? 0.8 : 1.2;
     currentZoom *= zoomAmount;
     currentZoom = Math.max(currentZoom, 0.1);
-    updateGridAndSpacing();  
+    updateGridAndSpacing();
     // Trigger Masonry Layout's layout after changing the CSS property
-    grid.layout();    
+    grid.layout();
+    // Save the zoom level
+    window.electronAPI.setZoomLevel(currentZoom);
   }
   else if (event.shiftKey)
   {
     // Determine the direction of the scroll
-    const paddingAmount = event.deltaY > 0 ? 0.1 : -0.1;
+    const paddingAmount = event.deltaY > 0 ? 0.02 : -0.02;
     currentPadding += paddingAmount;
     currentPadding = Math.max(Math.min(currentPadding, 1), 0.25);
     updateGridAndSpacing();

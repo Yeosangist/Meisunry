@@ -152,14 +152,13 @@
   animation: inherit !important; /* Transition the opacity property over 1 second */
 }
 body {
-  background: rgba(32, 32, 32, 1);
+  background: var(--app-bg, #2C313C);
   overflow-x: hidden;
   margin: 0;
   padding: 0;
   font-size: 40pt;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #949AA7;
-  background: #2C313C;
 }
 
 /* HEADER */
@@ -191,6 +190,7 @@ body {
   width: 100%;
   overflow: hidden;
   border: 1px solid #343B48;
+  box-sizing: border-box;
   -webkit-box-sizing: border-box;
   position: fixed;
   top: 0;
@@ -203,8 +203,10 @@ body {
   flex-direction: row;
   width: 100%;
   height: 100px;
-  background-color: #1B1D23;
+  background-color: var(--app-bg, #2C313C);
   -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .topBar > .titleBar{
@@ -305,12 +307,6 @@ body {
 #img-focus-wrapper.show {
   opacity: 1 !important;
   pointer-events: inherit;
-}
-#zoomPanHolder {
-  /*pointer-events: none;*/
-}
-.show > #zoomPanHolder {
-  /*pointer-events: inherit;*/
 }
 #img-focus {
   z-index: 1;

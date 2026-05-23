@@ -1,56 +1,61 @@
-# Meisunry
+# Cascade
 A minimalist, offline masonry image viewer.
 
-Masonry layouts are super common all over the web from websites like <a href="https://pinterest.com/">Pinterest</a>, <a href="https://www.artstation.com/">ArtStation</a>, or <a href="https://deviantart.com">DeviantArt</a>. In terms of offline masonry viewers, the options are more limited. There are some programs like <a href="https://apps.microsoft.com/store/detail/123-photos-view-edit-convert/9WZDNCRDXFXG?hl=en-us&gl=us&rtc=1">123 Photos</a> and <a href="https://apps.microsoft.com/store/detail/microsoft-photos/9WZDNCRFJBH4">Microsoft Photos</a>. However, I've found both of these solutions to have a bit too much in the way.
+Masonry layouts are super common all over the web from websites like <a href="https://pinterest.com/">Pinterest</a>, <a href="https://www.artstation.com/">ArtStation</a>, or <a href="https://deviantart.com">DeviantArt</a>. In terms of offline masonry viewers, the options are more limited. There are some programs like <a href="https://apps.microsoft.com/store/detail/123-photos-view-edit-convert/9WZDNCRDXFXG?hl=en-us&gl=us&rtc=1">123 Photos</a> and <a href="https://apps.microsoft.com/store/detail/microsoft-photos/9WZDNCRFJBH4">Microsoft Photos</a>. However, both of these solutions to have a bit too much in the way, and only work on Windows.
 
-This is where <b>Meisunry</b> comes in. Choose a folder and look at your images without any unnecessary details.
+This is where <b>Cascade</b> comes in. Choose a folder and look at your images without any unnecessary details.
 
 ![Demo](/app-icons/demo.gif)
 
 ## Controls
 
-<b>Left click:</b> Make target image fullscreen <br>
-<b>Right click:</b> Sorting options, recursion depth, and folder selection<br>
+<b>Left click:</b> Make target media fullscreen<br>
+<b>Right click:</b> Settings like sort order, recursion depth, and folder select<br>
 <b>Ctrl + Mouse wheel:</b> Zoom in/out<br>
 <b>Shift + Mouse wheel:</b> Padding control<br>
+<b>Esc: Close fullscreen view</b>
 
-## Adding Meisunry to file explorer context menu
+## Extra features
+<b>Automatic reload</b>: Refreshes the grid when a setting is changed<br>
+<b>Custom background colour</b>: Accessed from the right-click menu<br>
+<b>Folder persistence</b>: Remembers chosen folder between sessions<br>
+<b>Zoom persistence</b>: Remembers zoom level between sessions<br>
+<b>Format filtering</b>: Toggle display of images and videos from right-click menu
 
-> [!CAUTION]
-> Editing the registry can be dangerous if you don't know what you're doing. I would not recommend following this section if you are not comfortable with registry editing. 
+## Notes
+Doesn't handle loading 1000+ files very well. Try to keep it under 500.
 
-> [!NOTE]
-> The following has only been tested on Windows 10. I cannot guarantee that future or past versions of Windows will also work properly. (Although I assume it shouldn't be an issue.)
+## Installation
 
-First, find the location for each directory you would like to add the context menu actions.
-
-| Type | Location |
-| :---: | :---: |
-| <b>All files context menu</b> | Computer\HKEY_CLASSES_ROOT\\*\shell |
-| <b>No selection context menu</b> | Computer\HKEY_CLASSES_ROOT\Directory\Background\shell |
-| <b>Folder selected context menu</b> | Computer\HKEY_CLASSES_ROOT\Directory\shell |
-
-Under each `shell` folder, right-click to create a new key called `Meisunry`. And under that key, create another key called `command`. It should appear like in the images below.
-
-Now that the keys are created, you can set up the action itself. 
-
-### Meisunry Key
-
-In the `Meisunry` key, right click to create a new `String Value` with the name of `Icon`. The data for this should be set to the directory of your Meisunry installation as shown below. The (Default) string value data is for the preview text in the context menu. I'd recommend "Open with Meisunry."
-
-![Demo](/app-icons/MeisunryKey.png)
-
-### command Key
-
-In the `command` key, for the default string value, the value should be...<br> 
+### Development
+```bash
+npm install
+npm start
 ```
-"{MeisunryInstallation}" "%V"
+
+### Building
+```bash
+npm run package
 ```
-The %V will capture the directory you are targeting, so it is very important.
 
-![Demo](/app-icons/commandKey.png)
+### Linux Desktop Integration
+To integrate Cascade with your file manager (enable "Open with Cascade" context menu):
 
-If you did everything correctly, right-clicking in File Explorer or on the Desktop will show this option in your context menu!
+1. Install the application first using `npm run package` or `npm run make`
+2. Copy the desktop file to system applications:
+```bash
+sudo cp cascade.desktop /usr/share/applications/
+```
+3. Copy the icon to system icons:
+```bash
+sudo cp app-icons/logo.png /usr/share/icons/hicolor/256x256/apps/Cascade.png
+```
+4. Update desktop database:
+```bash
+sudo update-desktop-database /usr/share/applications/
+```
 
-![Demo](/app-icons/Success.png)
-
+After installation, you can:
+- Right-click folders or supported image/video files and select "Open with Cascade"
+- Set Cascade as the default viewer for supported file types
+- Launch Cascade from your application menu

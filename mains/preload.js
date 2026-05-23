@@ -15,5 +15,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onHideFocusImg: (callback) => ipcRenderer.on('hide-focus-img', callback), // Forwards 'hide-focus-img' event from main.js to renderer.js onHideFocusImg
   onPreferenceUpdate: (callback) => ipcRenderer.on('preference-update', callback), // Forwards 'preference-update' event from main.js to renderer.js onPreferenceUpdate
   onRefreshGrid: (callback) => ipcRenderer.on('refresh-grid-update', callback),
+  onOpenBgColorPicker: (callback) => ipcRenderer.on('open-bg-color-picker', callback),
+  onUpdateBgColor: (callback) => ipcRenderer.on('update-bg-color', (event, color) => callback(color)),
+  setBgColor: (color) => ipcRenderer.send('set-bg-color', color),
+  getBgColor: () => ipcRenderer.invoke('get-bg-color'),
+  setZoomLevel: (zoomLevel) => ipcRenderer.send('set-zoom-level', zoomLevel),
+  getZoomLevel: () => ipcRenderer.invoke('get-zoom-level'),
 })
 //contextBridge.exposeInMainWorld('contextMenu', contextMenu);

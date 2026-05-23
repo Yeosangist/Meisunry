@@ -10,6 +10,12 @@ contextMenu({
     const hasImage = !(parameters.srcURL === null || parameters.srcURL === '');
   return [
   {
+    label: 'Change Background Color',
+    click: () => {
+      browserWindow.webContents.send('open-bg-color-picker');
+    }
+  },
+  {
     label: 'Sort By',
     type: 'submenu',
     submenu: [
@@ -17,7 +23,7 @@ contextMenu({
       click: () => { 
         global.preferencesData.sortMode = 'newest';
         saveAppData();
-        browserWindow.webContents.send('sort-update'); 
+        refreshGrid(browserWindow); 
       },
       label: 'Newest',
       type: 'checkbox',
@@ -27,7 +33,7 @@ contextMenu({
       click: () => { 
         global.preferencesData.sortMode = 'oldest';
         saveAppData();
-        browserWindow.webContents.send('sort-update'); 
+        refreshGrid(browserWindow);
       },
       label: 'Oldest',
       type: 'checkbox',
@@ -37,7 +43,7 @@ contextMenu({
       click: () =>  { 
         global.preferencesData.sortMode = 'name-a';
         saveAppData();
-        browserWindow.webContents.send('sort-update'); 
+        refreshGrid(browserWindow);
       },
       label: 'Name A->Z',
       type: 'checkbox',
@@ -47,7 +53,7 @@ contextMenu({
       click: () =>  { 
         global.preferencesData.sortMode = 'name-z';
         saveAppData();
-        browserWindow.webContents.send('sort-update'); 
+        refreshGrid(browserWindow);
       },
       label: 'Name Z->A',
       type: 'checkbox',
@@ -57,7 +63,7 @@ contextMenu({
       click: () =>  { 
         global.preferencesData.sortMode = 'type-a';
         saveAppData();
-        browserWindow.webContents.send('sort-update'); 
+        refreshGrid(browserWindow);
       },
       label: 'Type A->Z',
       type: 'checkbox',
@@ -67,7 +73,7 @@ contextMenu({
       click: () =>  { 
         global.preferencesData.sortMode = 'type-z';
         saveAppData();
-        browserWindow.webContents.send('sort-update'); 
+        refreshGrid(browserWindow);
       },
       label: 'Type Z->A',
       type: 'checkbox',
@@ -77,7 +83,7 @@ contextMenu({
       click: () =>  { 
         global.preferencesData.sortMode = 'random';
         saveAppData();
-        browserWindow.webContents.send('sort-update'); 
+        refreshGrid(browserWindow);
       },
       label: 'Random',
       type: 'checkbox',
@@ -294,17 +300,6 @@ contextMenu({
     label: `Delete Image`,
     visible: hasImage,
     type: 'checkbox',
-    click: () => {
-      // Action to copy the image path to clipboard
-      const imagePath = decodeURIComponent(parameters.srcURL.replace("file:///", "/")); // Get the image source URL
-      clipboard.writeText(imagePath); // Copy the image path to clipboard
-      browserWindow.webContents.send('flash-copied', imagePath); 
-    }
-  },
-  {
-    label: `Delete Image`,
-    visible: hasImage,
-    type: 'checkbox',
     click: async () => {
       const imagePath = decodeURIComponent(parameters.srcURL.replace("file:///", "/")); // Get the image source URL
       
@@ -351,15 +346,15 @@ contextMenu({
       refreshGrid(browserWindow);
     }
   },
-  /*{
-    label: `Search Google for ${decodeURIComponent(parameters.srcURL.replace("file:///", ""))}`,
-    // Only show it when right-clicking text
-    visible: parameters.hasImageContents,
-    click: () => {
-      url = parameters.srcURL;
-      shell.openExternal(`https://lens.google.com/uploadbyurl?url=${url}`);
-    }
-  }*/
+//  {
+//    label: `Search Google for ${decodeURIComponent(parameters.srcURL.replace("file:///", ""))}`,
+//    // Only show it when right-clicking text
+//    visible: parameters.hasImageContents,
+//    click: () => {
+//      url = parameters.srcURL;
+//      shell.openExternal(`https://lens.google.com/uploadbyurl?url=${url}`);
+//    }
+//  }
 ]
 },
 showSelectAll: false,
