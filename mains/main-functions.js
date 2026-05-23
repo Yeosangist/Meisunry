@@ -88,12 +88,20 @@ function refreshGrid(browserWindow) {
   const folderPath = global.preferencesData.folderLocation;
   const maxDepth = global.preferencesData.recursion || 0;
   const sortMode = global.preferencesData.sortMode || 'date';
-  // Example: allowedFormats as an array of extensions, e.g. ['.jpg', '.png', ...]
-  const allowedFormats = global.preferencesData.allowedFormats || [
-    '.jpg', '.jpeg', '.png', '.gif', '.jfif', '.webp', '.mp4', '.webm', '.mkv', '.avi', '.mov', '.wmv', '.flv', '.mts'
-  ];
+  
+  // 3. Build allowedFormats based on Disable flags
+  const imageFormats = ['.jpg', '.jpeg', '.png', '.gif', '.jfif', '.webp'];
+  const videoFormats = ['.mp4', '.webm', '.mkv', '.avi', '.mov', '.wmv', '.flv', '.mts'];
+  
+  let allowedFormats = [];
+  if (!global.preferencesData.DisableImages) {
+    allowedFormats = allowedFormats.concat(imageFormats);
+  }
+  if (!global.preferencesData.DisableVideos) {
+    allowedFormats = allowedFormats.concat(videoFormats);
+  }
 
-  // 3. Scan for files using current settings
+  // 4. Scan for files using current settings
   let fileList = [];
   function scanDir(currentPath, currentDepth) {
     if (currentDepth > maxDepth) return;
