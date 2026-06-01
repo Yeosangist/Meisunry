@@ -5,7 +5,7 @@
 }
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px rgb(111, 211, 222);
+  box-shadow: inset 0 0 5px var(--app-bg, #2C313C);
   border-radius: 10px;
 }
 /* Handle */
@@ -189,7 +189,7 @@ body {
   flex-wrap: nowrap;
   width: 100%;
   overflow: hidden;
-  border: 1px solid #343B48;
+  border: 1px solid var(--app-bg, #2C313C);
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
   position: fixed;

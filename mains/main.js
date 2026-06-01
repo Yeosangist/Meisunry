@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, globalShortcut, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, globalShortcut, Menu, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { loadFolder, saveAppData, truncateFilePathToNearestFolder, loadData, loadIndex } = require('./main-functions');
@@ -149,6 +149,23 @@ app.whenReady().then(() => {
 
   globalShortcut.register('Escape', () => {
     browserWindow.webContents.send('hide-focus-img');
+  });
+
+  globalShortcut.register('CommandOrControl+F', () => {
+    const options = {
+      title: 'Select a Folder',
+      properties: ['openDirectory'],
+      defaultPath: global.preferencesData.folderLocation,
+    };
+    dialog.showOpenDialog(browserWindow, options)
+      .then(result => {
+        if (!result.canceled && result.filePaths.length > 0) {
+          loadFolder(browserWindow, result.filePaths[0]);
+        }
+      })
+      .catch(err => {
+        console.error('Error opening folder dialog:', err);
+      });
   });
 
   ipcMain.handle('loadAppData', () => {

@@ -350,6 +350,7 @@ window.electronAPI.getBgColor().then(color => {
   if (color) {
     initialColor = color;
     document.body.style.backgroundColor = initialColor; // apply saved color at startup
+    document.documentElement.style.setProperty('--app-bg', initialColor); // set CSS variable for title bar
   }
 });
 
