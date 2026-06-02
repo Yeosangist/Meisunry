@@ -14,7 +14,7 @@ This is where <b>Cascade</b> comes in. Choose a folder and look at your images w
 <b>Ctrl + F:</b> Choose another folder<br>
 <b>Ctrl + Mouse wheel:</b> Zoom in/out<br>
 <b>Shift + Mouse wheel:</b> Padding control<br>
-<b>Esc: Close fullscreen view</b>
+<b>Esc:</b> Close fullscreen view
 
 ## Extra features
 <b>Automatic reload</b>: Refreshes the grid when a setting is changed<br>
