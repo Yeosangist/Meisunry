@@ -1,6 +1,7 @@
 const contextMenu = require('electron-context-menu');
 const { app, clipboard, dialog, shell } = require('electron');
 const fs = require('fs');
+const path = require('path');
 const { loadFolder, saveAppData, loadData, loadIndex, refreshGrid } = require('./main-functions');
 // let trash;
 // import('trash').then((trashModule) => { trash = trashModule.default ?? trashModule; });

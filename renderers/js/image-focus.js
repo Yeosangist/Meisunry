@@ -4,7 +4,10 @@ focusImgVideoWrapper.onmousedown = (e) => {
   downTime = performance.now();
 };
 focusImgVideoWrapper.onmouseup = (e) => {
-  if (performance.now() - downTime < 150) hideFocusImg();
+  // Only close if clicking on the wrapper background (not on image/video/buttons)
+  if (e.target === focusImgVideoWrapper && performance.now() - downTime < 150) {
+    hideFocusImg();
+  }
 };
 
 // Exit full screen button
